@@ -1,0 +1,136 @@
+---
+title: "Apply ctSVG to Visium HD data"
+author: "Haotian Zhuang"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Apply ctSVG to Visium HD data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+We will demonstrate how to use ctSVG to generate single-cell gene expression profiles and identify cell-type-specific SVGs from Visium HD data. The Visium HD dataset of a mouse brain tissue was downloaded from the [10x website](https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-mouse-brain-he). For analyzing Visium HD data, ctSVG requires two inputs: [10x Space Ranger outputs](https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz), and nuclei segmentation results.
+
+# Nuclei segmentation
+The nuclei segmentation results can be obtained by running segmentation methods, such as [**StarDist**](https://github.com/stardist/stardist), on the H\&E images accompanying the Visium HD data. Here, the microscope image of the mouse brain tissue was downloaded from the [10x website](https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_tissue_image.tif).
+
+```
+import pandas as pd
+import numpy as np
+from tifffile import imread, imwrite
+from csbdeep.utils import normalize
+from stardist.models import StarDist2D
+
+img = imread('Visium_HD_Mouse_Brain_tissue_image.tif')
+
+# Load the pretrained model
+model = StarDist2D.from_pretrained('2D_versatile_he')
+
+# Percentile normalization of the image
+min_percentile = 5
+max_percentile = 95
+img = normalize(img, min_percentile, max_percentile)
+
+# Stardist
+labels, polys = model.predict_instances_big(img, axes='YXC', block_size=4096, prob_thresh=0.01,nms_thresh=0.001, min_overlap=128, context=128, normalizer=None, n_tiles=(4,4,1))
+
+# Convert data format
+data = [(cell_id, x, y) for cell_id, (xs, ys) in enumerate(polys['coord']) for x, y in zip(xs, ys)]
+df = pd.DataFrame(data, columns=['Cell', 'X', 'Y'])
+
+df.to_csv('nuclei.csv', index=False)
+```
+
+# Load packages and datasets
+```{r setup}
+library(ctSVG)
+mydir <- "~/Desktop/Research/ctSVG/mouse_brain"
+list.files(mydir)
+```
+
+# Assign each square to a cell
+```{r}
+suppressMessages(suppressWarnings(
+  cellassignRes <- cellassign(visiumpath = file.path(mydir, "binned_outputs/square_002um"),
+                              segmentationpath = file.path(mydir, "nuclei.csv"))
+))
+```
+
+```{r eval=FALSE, include=FALSE}
+cellassignRes_ref <- readRDS(system.file("extdata", "cellassignRes.rds", package = "ctSVG"))
+all.equal(cellassignRes, cellassignRes_ref)
+```
+
+```{r}
+str(cellassignRes)
+coord <- cellassignRes$coord
+```
+
+# Generate single-cell gene expression profiles
+```{r}
+count <- getexpr(cellassignRes = cellassignRes,
+                 visiumpath = file.path(mydir, "binned_outputs/square_002um"))
+str(count)
+```
+
+# Run Seurat pipeline
+```{r}
+suppressMessages(suppressWarnings(
+  d <- runseurat(count = count)
+))
+```
+
+# Reassign cells to clusters
+In this vignette, `n.max` is set to 200 to reduce computational time. By default, `n.max` is set to 1,000 in practice.
+
+```{r}
+recluRes <- recluster(d = d, n.max = 200)
+names(recluRes)
+```
+
+# Identify spatially variable genes within each cell cluster
+```{r}
+suppressMessages(suppressWarnings(
+  clutestRes <- ctsvg_test(d = d, coord = coord,
+                           clu.list = recluRes$clu.list,
+                           jac.mat = recluRes$jac.mat)
+))
+head(clutestRes)
+```
+
+# Fit spatial gene expression patterns within each cell cluster
+```{r}
+clufitRes <- ctsvg_fit(d = d, coord = coord)
+```
+
+# Visualize spatial patterns of a single gene
+```{r}
+plotGene(d = d, clufitRes = clufitRes, coord = coord, gene = clutestRes$gene[1],
+         cluster = "0", background = TRUE)
+```
+
+# Identify gene modules within each cell cluster
+```{r}
+moduleRes <- ctsvg_module(d = d, clutestRes = clutestRes, clufitRes = clufitRes)
+```
+
+# Visualize spatial patterns of metagenes within a cell cluster
+```{r}
+plotMetagene(d = d, clufitRes = clufitRes, moduleRes = moduleRes, coord = coord,
+             cluster = "0", background = TRUE)
+```
+
+<details>
+  <summary>**Session Info**</summary>
+```{r}
+sessionInfo()
+```
+</details>

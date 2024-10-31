@@ -1,0 +1,31 @@
+Package: ctSVG
+Title: Identification of cell-type-specific SVGs
+Version: 1.0
+Authors@R: c(
+    person("Haotian", "Zhuang", email = "haotian.zhuang@duke.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0513-748X")),
+    person("Zhicheng", "Ji", email = "zhicheng.ji@duke.edu", role = "aut", comment = c(ORCID = "0000-0002-9457-4704")))
+Description: A computational method to extract single-cell gene expression profiles from Visium HD data and identify cell-type-specific SVGs.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    arrow,
+    data.table,
+    findPC,
+    fitdistrplus,
+    ggplot2,
+    hdf5r,
+    igraph,
+    Matrix,
+    matrixStats,
+    pbapply,
+    RColorBrewer,
+    rjson,
+    Seurat,
+    sf,
+    SparseArray,
+    splines,
+    stats
+URL: https://haotian-zhuang.github.io/ctSVG/, https://github.com/haotian-zhuang/ctSVG
+BugReports: https://github.com/haotian-zhuang/ctSVG/issues
