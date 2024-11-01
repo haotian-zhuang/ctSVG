@@ -59,7 +59,7 @@
                         <h4 data-toc-skip class="author">Haotian
 Zhuang</h4>
             
-            <h4 data-toc-skip class="date">October 27, 2024</h4>
+            <h4 data-toc-skip class="date">November 01, 2024</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/haotian-zhuang/ctSVG/blob/HEAD/vignettes/Visium%20HD.Rmd" class="external-link"><code>vignettes/Visium HD.Rmd</code></a></small>
       <div class="d-none name"><code>Visium HD.Rmd</code></div>
@@ -74,17 +74,20 @@ Zhuang</h4>
 expression profiles and identify cell-type-specific SVGs from Visium HD
 data. The Visium HD dataset of a mouse brain tissue was downloaded from
 the <a href="https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-mouse-brain-he" class="external-link">10x
-website</a>. For analyzing Visium HD data, ctSVG requires two inputs: <a href="https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz" class="external-link">10x
-Space Ranger outputs</a>, and nuclei segmentation results.</p>
+website</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="nuclei-segmentation">Nuclei segmentation<a class="anchor" aria-label="anchor" href="#nuclei-segmentation"></a>
+<h2 id="download-space-ranger-output-files-and-he-image">Download Space Ranger output files and H&amp;E image<a class="anchor" aria-label="anchor" href="#download-space-ranger-output-files-and-he-image"></a>
+</h2>
+<p>The Space Ranger output files were downloaded at <a href="https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz" class="external-link uri">https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz</a>.
+The H&amp;E image was downloaded at <a href="https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_tissue_image.tif" class="external-link uri">https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_tissue_image.tif</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="perform-nuclei-segmentation">Perform nuclei segmentation<a class="anchor" aria-label="anchor" href="#perform-nuclei-segmentation"></a>
 </h2>
 <p>The nuclei segmentation results can be obtained by running
 segmentation methods, such as <a href="https://github.com/stardist/stardist" class="external-link"><strong>StarDist</strong></a>,
-on the H&amp;E images accompanying the Visium HD data. Here, the
-microscope image of the mouse brain tissue was downloaded from the <a href="https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_tissue_image.tif" class="external-link">10x
-website</a>.</p>
+on the H&amp;E image accompanying the Visium HD data.</p>
 <pre><code>import pandas as pd
 import numpy as np
 from tifffile import imread, imwrite
@@ -111,7 +114,7 @@ df = pd.DataFrame(data, columns=['Cell', 'X', 'Y'])
 df.to_csv('nuclei.csv', index=False)</code></pre>
 </div>
 <div class="section level2">
-<h2 id="load-packages-and-datasets">Load packages and datasets<a class="anchor" aria-label="anchor" href="#load-packages-and-datasets"></a>
+<h2 id="load-package">Load package<a class="anchor" aria-label="anchor" href="#load-package"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haotian-zhuang.github.io/ctSVG/">ctSVG</a></span><span class="op">)</span></span>
@@ -170,18 +173,14 @@ df.to_csv('nuclei.csv', index=False)</code></pre>
 computational time. By default, <code>n.max</code> is set to 1,000 in
 practice.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">recluRes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recluster.html">recluster</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">d</span>, n.max <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">recluRes</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "jac.mat"  "clu.list"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">recluRes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recluster.html">recluster</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">d</span>, n.max <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="identify-spatially-variable-genes-within-each-cell-cluster">Identify spatially variable genes within each cell cluster<a class="anchor" aria-label="anchor" href="#identify-spatially-variable-genes-within-each-cell-cluster"></a>
 </h2>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span></span>
-<span>  <span class="va">clutestRes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ctsvg_test.html">ctsvg_test</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">d</span>, coord <span class="op">=</span> <span class="va">coord</span>,</span>
-<span>                           clu.list <span class="op">=</span> <span class="va">recluRes</span><span class="op">$</span><span class="va">clu.list</span>,</span>
-<span>                           jac.mat <span class="op">=</span> <span class="va">recluRes</span><span class="op">$</span><span class="va">jac.mat</span><span class="op">)</span></span>
+<span>  <span class="va">clutestRes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ctsvg_test.html">ctsvg_test</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">d</span>, coord <span class="op">=</span> <span class="va">coord</span>, recluRes <span class="op">=</span> <span class="va">recluRes</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">clutestRes</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           cluster    gene           fdr          pval fdr.empirical</span></span>
@@ -210,7 +209,7 @@ practice.</p>
 </h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotGene.html">plotGene</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">d</span>, clufitRes <span class="op">=</span> <span class="va">clufitRes</span>, coord <span class="op">=</span> <span class="va">coord</span>, gene <span class="op">=</span> <span class="va">clutestRes</span><span class="op">$</span><span class="va">gene</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>         cluster <span class="op">=</span> <span class="st">"0"</span>, background <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>         cellclu <span class="op">=</span> <span class="st">"0"</span>, background <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visium%20HD_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -224,7 +223,7 @@ practice.</p>
 </h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotMetagene.html">plotMetagene</a></span><span class="op">(</span>d <span class="op">=</span> <span class="va">d</span>, clufitRes <span class="op">=</span> <span class="va">clufitRes</span>, moduleRes <span class="op">=</span> <span class="va">moduleRes</span>, coord <span class="op">=</span> <span class="va">coord</span>,</span>
-<span>             cluster <span class="op">=</span> <span class="st">"0"</span>, background <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>             cellclu <span class="op">=</span> <span class="st">"0"</span>, background <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visium%20HD_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <details><summary><strong>Session Info</strong>
 </summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">

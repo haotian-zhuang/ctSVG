@@ -46,8 +46,7 @@
 <span>  <span class="va">d</span>,</span>
 <span>  <span class="va">coord</span>,</span>
 <span>  cell.filter <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  clu.list <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  jac.mat <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  recluRes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min.cells <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">2024</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -71,12 +70,8 @@
 <dd><p>Whether to remove spatially isolated cells within each cell cluster (<code>TRUE</code> by default)</p></dd>
 
 
-<dt id="arg-clu-list">clu.list<a class="anchor" aria-label="anchor" href="#arg-clu-list"></a></dt>
-<dd><p>The list of reassigned clusters from <code><a href="recluster.html">recluster</a></code></p></dd>
-
-
-<dt id="arg-jac-mat">jac.mat<a class="anchor" aria-label="anchor" href="#arg-jac-mat"></a></dt>
-<dd><p>The matrix of Jaccard indices from <code><a href="recluster.html">recluster</a></code></p></dd>
+<dt id="arg-reclures">recluRes<a class="anchor" aria-label="anchor" href="#arg-reclures"></a></dt>
+<dd><p>The output from <code><a href="recluster.html">recluster</a></code></p></dd>
 
 
 <dt id="arg-min-cells">min.cells<a class="anchor" aria-label="anchor" href="#arg-min-cells"></a></dt>

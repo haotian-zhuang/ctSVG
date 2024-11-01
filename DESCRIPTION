@@ -1,5 +1,5 @@
 Package: ctSVG
-Title: Identification of cell-type-specific SVGs
+Title: Identifying cell-type-specific spatially variable genes
 Version: 1.0
 Authors@R: c(
     person("Haotian", "Zhuang", email = "haotian.zhuang@duke.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0513-748X")),

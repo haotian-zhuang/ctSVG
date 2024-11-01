@@ -17,10 +17,13 @@ knitr::opts_chunk$set(
 ```
 
 # Introduction
-We will demonstrate how to use ctSVG to generate single-cell gene expression profiles and identify cell-type-specific SVGs from Visium HD data. The Visium HD dataset of a mouse brain tissue was downloaded from the [10x website](https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-mouse-brain-he). For analyzing Visium HD data, ctSVG requires two inputs: [10x Space Ranger outputs](https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz), and nuclei segmentation results.
+We will demonstrate how to use ctSVG to generate single-cell gene expression profiles and identify cell-type-specific SVGs from Visium HD data. The Visium HD dataset of a mouse brain tissue was downloaded from the [10x website](https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-mouse-brain-he).
 
-# Nuclei segmentation
-The nuclei segmentation results can be obtained by running segmentation methods, such as [**StarDist**](https://github.com/stardist/stardist), on the H\&E images accompanying the Visium HD data. Here, the microscope image of the mouse brain tissue was downloaded from the [10x website](https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_tissue_image.tif).
+# Download Space Ranger output files and H\&E image
+The Space Ranger output files were downloaded at <https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_binned_outputs.tar.gz>. The H\&E image was downloaded at <https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Mouse_Brain/Visium_HD_Mouse_Brain_tissue_image.tif>.
+
+# Perform nuclei segmentation
+The nuclei segmentation results can be obtained by running segmentation methods, such as [**StarDist**](https://github.com/stardist/stardist), on the H\&E image accompanying the Visium HD data.
 
 ```
 import pandas as pd
@@ -49,7 +52,7 @@ df = pd.DataFrame(data, columns=['Cell', 'X', 'Y'])
 df.to_csv('nuclei.csv', index=False)
 ```
 
-# Load packages and datasets
+# Load package
 ```{r setup}
 library(ctSVG)
 mydir <- "~/Desktop/Research/ctSVG/mouse_brain"
@@ -93,15 +96,12 @@ In this vignette, `n.max` is set to 200 to reduce computational time. By default
 
 ```{r}
 recluRes <- recluster(d = d, n.max = 200)
-names(recluRes)
 ```
 
 # Identify spatially variable genes within each cell cluster
 ```{r}
 suppressMessages(suppressWarnings(
-  clutestRes <- ctsvg_test(d = d, coord = coord,
-                           clu.list = recluRes$clu.list,
-                           jac.mat = recluRes$jac.mat)
+  clutestRes <- ctsvg_test(d = d, coord = coord, recluRes = recluRes)
 ))
 head(clutestRes)
 ```
@@ -114,7 +114,7 @@ clufitRes <- ctsvg_fit(d = d, coord = coord)
 # Visualize spatial patterns of a single gene
 ```{r}
 plotGene(d = d, clufitRes = clufitRes, coord = coord, gene = clutestRes$gene[1],
-         cluster = "0", background = TRUE)
+         cellclu = "0", background = TRUE)
 ```
 
 # Identify gene modules within each cell cluster
@@ -125,7 +125,7 @@ moduleRes <- ctsvg_module(d = d, clutestRes = clutestRes, clufitRes = clufitRes)
 # Visualize spatial patterns of metagenes within a cell cluster
 ```{r}
 plotMetagene(d = d, clufitRes = clufitRes, moduleRes = moduleRes, coord = coord,
-             cluster = "0", background = TRUE)
+             cellclu = "0", background = TRUE)
 ```
 
 <details>

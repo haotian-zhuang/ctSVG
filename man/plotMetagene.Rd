@@ -4,7 +4,7 @@
 \alias{plotMetagene}
 \title{Visualize spatial patterns of metagenes within a cell cluster}
 \usage{
-plotMetagene(d, clufitRes, moduleRes, coord, cluster, background = FALSE, ...)
+plotMetagene(d, clufitRes, moduleRes, coord, cellclu, background = FALSE, ...)
 }
 \arguments{
 \item{d}{The output from \code{\link{runseurat}}}
@@ -15,7 +15,7 @@ plotMetagene(d, clufitRes, moduleRes, coord, cluster, background = FALSE, ...)
 
 \item{coord}{The matrix of spatial locations from \code{\link{cellassign}}}
 
-\item{cluster}{A character value indicating which cell cluster to plot}
+\item{cellclu}{A character value indicating which cell cluster to plot}
 
 \item{background}{Whether to plot all cells (\code{FALSE} by default)}
 

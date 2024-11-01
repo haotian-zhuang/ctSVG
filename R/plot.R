@@ -4,14 +4,14 @@
 #' @param clufitRes The output from \code{\link{ctsvg_fit}} (\code{NULL} by default, original gene expression matrix)
 #' @param coord The matrix of spatial locations from \code{\link{cellassign}}
 #' @param gene Which gene to plot
-#' @param cluster A character value indicating which cell cluster to plot (\code{NULL} by default, all cells)
+#' @param cellclu A character value indicating which cell cluster to plot (\code{NULL} by default, all cells)
 #' @param background Whether to plot all cells (\code{FALSE} by default)
 #' @param ... The parameters in the \code{geom_point(...)} function
 #' @import ggplot2
 #' @return A ggplot2 plot
 #' @export
 #'
-plotGene <- function(d, clufitRes = NULL, coord, gene, cluster = NULL, background = FALSE, ...) {
+plotGene <- function(d, clufitRes = NULL, coord, gene, cellclu = NULL, background = FALSE, ...) {
   sc <- Idents(d)
   sccell <- split(names(sc), sc)
   
@@ -21,10 +21,10 @@ plotGene <- function(d, clufitRes = NULL, coord, gene, cluster = NULL, backgroun
     expr <- clufitRes
   }
   
-  if(is.null(cluster)) {
+  if(is.null(cellclu)) {
     i <- rownames(coord) 
   } else {
-    i <- sccell[[cluster]]
+    i <- sccell[[cellclu]]
   }
   i <- intersect(intersect(i, rownames(coord)), colnames(expr))
   df <- data.frame(expr = expr[gene, i], row = coord[i, "row"], col = coord[i, "col"])
@@ -62,14 +62,14 @@ plotGene <- function(d, clufitRes = NULL, coord, gene, cluster = NULL, backgroun
 #' @param clufitRes The output from \code{\link{ctsvg_fit}}
 #' @param moduleRes The output from \code{\link{ctsvg_module}}
 #' @param coord The matrix of spatial locations from \code{\link{cellassign}}
-#' @param cluster A character value indicating which cell cluster to plot
+#' @param cellclu A character value indicating which cell cluster to plot
 #' @param background Whether to plot all cells (\code{FALSE} by default)
 #' @param ... The parameters in the \code{geom_point(...)} function
 #' @import ggplot2
 #' @return A ggplot2 plot
 #' @export
 #'
-plotMetagene <- function(d, clufitRes, moduleRes, coord, cluster, background = FALSE, ...) {
+plotMetagene <- function(d, clufitRes, moduleRes, coord, cellclu, background = FALSE, ...) {
   sc <- Idents(d)
   sccell <- split(names(sc), sc)
   
@@ -87,7 +87,7 @@ plotMetagene <- function(d, clufitRes, moduleRes, coord, cluster, background = F
     }, simplify = FALSE))
   }, simplify = FALSE)
   
-  df <- gene.agg[[cluster]]
+  df <- gene.agg[[cellclu]]
   df$module <- factor(df$module, levels = unique(df$module))
   l <- df$expr
   l[l > quantile(l, 0.99, na.rm = TRUE)] <- quantile(l, 0.99, na.rm = TRUE)

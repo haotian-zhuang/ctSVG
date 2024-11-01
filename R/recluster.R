@@ -21,7 +21,7 @@ recluster <- function(d, n.max = 1e3, resolution = 1.2) {
     d.tmp <- FindClusters(d, verbose = FALSE, resolution = resolution, random.seed = i)
     sc.tmp <- Idents(d.tmp)
     sccell.tmp <- split(names(sc.tmp), sc.tmp)
-    jac.tmp <- PairWiseJaccardSets(sc, sc.tmp)
+    jac.tmp <- getjacmat(sc, sc.tmp)
     
     jac.mat[, i] <- apply(jac.tmp, 1, max)
     match.tmp <- apply(jac.tmp, 1, which.max)
@@ -32,17 +32,21 @@ recluster <- function(d, n.max = 1e3, resolution = 1.2) {
   return(list(jac.mat = jac.mat, clu.list = clu.list))
 }
 
-JaccardSets <- function(set1, set2){
+getjac <- function(set1, set2) {
   length(intersect(set1, set2)) / length(unique(c(set1, set2)))
 }
 
-PairWiseJaccardSets <- function(ident1, ident2){
+getjacmat <- function(ident1, ident2) {
   ident1.list <- split(names(ident1), ident1)
   ident2.list <- split(names(ident2), ident2)
-  res <- matrix(nrow = length(ident1.list), ncol = length(ident2.list),
-                dimnames = list(names(ident1.list), names(ident2.list)))
-  for (i in seq_along(ident1.list)){
-    res[i, ] <- purrr::map_dbl(ident2.list, ~JaccardSets(ident1.list[[i]], .x))
+  
+  jacmat <- matrix(nrow = length(ident1.list), ncol = length(ident2.list),
+                   dimnames = list(names(ident1.list), names(ident2.list)))
+  
+  for (i in seq_along(ident1.list)) {
+    jacmat[i, ] <- sapply(ident2.list, function(x) {
+      getjac(ident1.list[[i]], x)
+    })
   }
-  return(res)
+  return(jacmat)
 }

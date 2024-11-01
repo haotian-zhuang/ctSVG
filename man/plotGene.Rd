@@ -9,7 +9,7 @@ plotGene(
   clufitRes = NULL,
   coord,
   gene,
-  cluster = NULL,
+  cellclu = NULL,
   background = FALSE,
   ...
 )
@@ -23,7 +23,7 @@ plotGene(
 
 \item{gene}{Which gene to plot}
 
-\item{cluster}{A character value indicating which cell cluster to plot (\code{NULL} by default, all cells)}
+\item{cellclu}{A character value indicating which cell cluster to plot (\code{NULL} by default, all cells)}
 
 \item{background}{Whether to plot all cells (\code{FALSE} by default)}
 

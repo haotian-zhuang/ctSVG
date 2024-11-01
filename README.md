@@ -28,7 +28,7 @@ Detailed vignettes are available at this [website](https://haotian-zhuang.github
 
 ## Citation
 
-Please cite the following paper: [To be submitted](https://www.biorxiv.org)
+Please cite the following paper: [Submitted](https://www.biorxiv.org)
 
 ## Contact
 

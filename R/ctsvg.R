@@ -3,8 +3,7 @@
 #' @param d The output from \code{\link{runseurat}}
 #' @param coord The matrix of spatial locations from \code{\link{cellassign}}
 #' @param cell.filter Whether to remove spatially isolated cells within each cell cluster (\code{TRUE} by default)
-#' @param clu.list The list of reassigned clusters from \code{\link{recluster}}
-#' @param jac.mat The matrix of Jaccard indices from \code{\link{recluster}}
+#' @param recluRes The output from \code{\link{recluster}}
 #' @param min.cells The minimum proportion of cells within each cell cluster a gene is expressed in to be retained (0.01 by default)
 #' @param seed Random seed for permutation (2024 by default)
 #' @param verbose Whether to print the cell cluster in progress (\code{FALSE} by default)
@@ -13,7 +12,7 @@
 #' @return A data frame with p-values and FDRs for each gene in each cell cluster
 #' @export
 #'
-ctsvg_test <- function(d, coord, cell.filter = TRUE, clu.list = NULL, jac.mat = NULL, min.cells = 0.01, seed = 2024, verbose = FALSE, n.permute = 100) {
+ctsvg_test <- function(d, coord, cell.filter = TRUE, recluRes = NULL, min.cells = 0.01, seed = 2024, verbose = FALSE, n.permute = 100) {
   expr <- d@assays$RNA$data
   if(!identical(colnames(expr), rownames(coord))) { coord <- coord[intersect(colnames(expr), rownames(coord)), ] }
   
@@ -21,7 +20,7 @@ ctsvg_test <- function(d, coord, cell.filter = TRUE, clu.list = NULL, jac.mat = 
   sccell <- split(names(sc), sc)
   if(cell.filter) { sccell <- lapply(sccell, function(k) { k[!detectOutlier(coord = coord[k, ])] }) }
   
-  if(is.null(clu.list)) {
+  if(is.null(recluRes)) {
     clutestRes <- do.call(rbind, sapply(names(sccell), function(k) {
       i <- sccell[[k]]
       expr_clu <- expr[, i]
@@ -29,6 +28,9 @@ ctsvg_test <- function(d, coord, cell.filter = TRUE, clu.list = NULL, jac.mat = 
       data.frame(cluster = k, gene = rownames(res), res)
     }, simplify = FALSE))
   } else {
+    clu.list = recluRes$clu.list
+    jac.mat = recluRes$jac.mat
+    
     set.seed(seed = seed)
     clutestRes <- do.call(rbind, sapply(names(sccell), function(k) {
       if(verbose) { print(k) }

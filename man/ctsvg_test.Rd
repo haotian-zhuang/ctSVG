@@ -8,8 +8,7 @@ ctsvg_test(
   d,
   coord,
   cell.filter = TRUE,
-  clu.list = NULL,
-  jac.mat = NULL,
+  recluRes = NULL,
   min.cells = 0.01,
   seed = 2024,
   verbose = FALSE,
@@ -23,9 +22,7 @@ ctsvg_test(
 
 \item{cell.filter}{Whether to remove spatially isolated cells within each cell cluster (\code{TRUE} by default)}
 
-\item{clu.list}{The list of reassigned clusters from \code{\link{recluster}}}
-
-\item{jac.mat}{The matrix of Jaccard indices from \code{\link{recluster}}}
+\item{recluRes}{The output from \code{\link{recluster}}}
 
 \item{min.cells}{The minimum proportion of cells within each cell cluster a gene is expressed in to be retained (0.01 by default)}
 
