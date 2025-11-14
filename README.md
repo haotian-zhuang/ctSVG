@@ -28,7 +28,7 @@ Detailed vignettes are available at this [website](https://haotian-zhuang.github
 
 ## Citation
 
-Please cite the following paper: [Submitted](https://www.biorxiv.org)
+Please cite the following paper: [Haotian Zhuang, Xinyi Shang, Wenpin Hou, Zhicheng Ji. Identifying cell-type-specific spatially variable genes with ctSVG. Genome Biology (Accepted).](https://pmc.ncbi.nlm.nih.gov/articles/PMC11702777/)
 
 ## Contact
 
