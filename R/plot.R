@@ -1,8 +1,9 @@
 #' Visualize spatial patterns of a single gene
 #'
-#' @param d The output from \code{\link{runseurat}}
+#' @param expr The normalized gene expression matrix
 #' @param clufitRes The output from \code{\link{ctsvg_fit}} (\code{NULL} by default, original gene expression matrix)
-#' @param coord The matrix of spatial locations from \code{\link{cellassign}}
+#' @param coord The matrix of spatial locations
+#' @param sc The named vector of cell cluster assignments
 #' @param gene Which gene to plot
 #' @param cellclu A character value indicating which cell cluster to plot (\code{NULL} by default, all cells)
 #' @param background Whether to plot all cells (\code{FALSE} by default)
@@ -11,12 +12,11 @@
 #' @return A ggplot2 plot
 #' @export
 #'
-plotGene <- function(d, clufitRes = NULL, coord, gene, cellclu = NULL, background = FALSE, ...) {
-  sc <- Idents(d)
+plotGene <- function(expr, clufitRes = NULL, coord, sc, gene, cellclu = NULL, background = FALSE, ...) {
   sccell <- split(names(sc), sc)
   
   if(is.null(clufitRes)) {
-    expr <- d@assays$RNA$data
+    expr <- expr
   } else {
     expr <- clufitRes
   }
@@ -58,10 +58,10 @@ plotGene <- function(d, clufitRes = NULL, coord, gene, cellclu = NULL, backgroun
 
 #' Visualize spatial patterns of metagenes within a cell cluster
 #'
-#' @param d The output from \code{\link{runseurat}}
 #' @param clufitRes The output from \code{\link{ctsvg_fit}}
+#' @param coord The matrix of spatial locations
+#' @param sc The named vector of cell cluster assignments
 #' @param moduleRes The output from \code{\link{ctsvg_module}}
-#' @param coord The matrix of spatial locations from \code{\link{cellassign}}
 #' @param cellclu A character value indicating which cell cluster to plot
 #' @param background Whether to plot all cells (\code{FALSE} by default)
 #' @param ... The parameters in the \code{geom_point(...)} function
@@ -69,8 +69,7 @@ plotGene <- function(d, clufitRes = NULL, coord, gene, cellclu = NULL, backgroun
 #' @return A ggplot2 plot
 #' @export
 #'
-plotMetagene <- function(d, clufitRes, moduleRes, coord, cellclu, background = FALSE, ...) {
-  sc <- Idents(d)
+plotMetagene <- function(clufitRes, coord, sc, moduleRes, cellclu, background = FALSE, ...) {
   sccell <- split(names(sc), sc)
   
   gene.agg <- sapply(names(moduleRes), function(k) {

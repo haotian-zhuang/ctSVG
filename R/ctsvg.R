@@ -1,22 +1,21 @@
 #' Identify spatially variable genes within each cell cluster
 #'
-#' @param d The output from \code{\link{runseurat}}
-#' @param coord The matrix of spatial locations from \code{\link{cellassign}}
+#' @param expr The normalized gene expression matrix
+#' @param coord The matrix of spatial locations
+#' @param sc The named vector of cell cluster assignments
 #' @param cell.filter Whether to remove spatially isolated cells within each cell cluster (\code{TRUE} by default)
 #' @param recluRes The output from \code{\link{recluster}}
 #' @param min.cells The minimum proportion of cells within each cell cluster a gene is expressed in to be retained (0.01 by default)
 #' @param seed Random seed for permutation (2024 by default)
 #' @param verbose Whether to print the cell cluster in progress (\code{FALSE} by default)
 #' @param n.permute Number of permutation times (reassigned clusters with the highest Jaccard indices, 100 by default)
-#' @import Seurat
+
 #' @return A data frame with p-values and FDRs for each gene in each cell cluster
 #' @export
 #'
-ctsvg_test <- function(d, coord, cell.filter = TRUE, recluRes = NULL, min.cells = 0.01, seed = 2024, verbose = FALSE, n.permute = 100) {
-  expr <- d@assays$RNA$data
+ctsvg_test <- function(expr, coord, sc, cell.filter = TRUE, recluRes = NULL, min.cells = 0.01, seed = 2024, verbose = FALSE, n.permute = 100) {
   if(!identical(colnames(expr), rownames(coord))) { coord <- coord[intersect(colnames(expr), rownames(coord)), ] }
   
-  sc <- Idents(d)
   sccell <- split(names(sc), sc)
   if(cell.filter) { sccell <- lapply(sccell, function(k) { k[!detectOutlier(coord = coord[k, ])] }) }
   
@@ -54,18 +53,17 @@ ctsvg_test <- function(d, coord, cell.filter = TRUE, recluRes = NULL, min.cells 
 
 #' Fit spatial gene expression patterns within each cell cluster
 #'
-#' @param d The output from \code{\link{runseurat}}
-#' @param coord The matrix of spatial locations from \code{\link{cellassign}}
+#' @param expr The normalized gene expression matrix
+#' @param coord The matrix of spatial locations
+#' @param sc The named vector of cell cluster assignments
 #' @param cell.filter Whether to remove spatially isolated cells within each cell cluster (\code{TRUE} by default)
-#' @import Seurat
+
 #' @return The fitted cell-cluster-specific gene expression matrix
 #' @export
 #'
-ctsvg_fit <- function(d, coord, cell.filter = TRUE) {
-  expr <- d@assays$RNA$data
+ctsvg_fit <- function(expr, coord, sc, cell.filter = TRUE) {
   if(!identical(colnames(expr), rownames(coord))) { coord <- coord[intersect(colnames(expr), rownames(coord)), ] }
   
-  sc <- Idents(d)
   sccell <- split(names(sc), sc)
   if(cell.filter) { sccell <- lapply(sccell, function(k) { k[!detectOutlier(coord = coord[k, ])] }) }
   
@@ -139,6 +137,8 @@ spatialTestFixed <- function(expr, coord, knot = F, maxknotallowed = 5) {
     colnames(B) <- NULL
     tBB <- crossprod(B)
     rownames(tBB) <- colnames(tBB) <- NULL
+    
+    if ('try-error'%in%class(try(chol(tBB), silent = T))) { tBB <- tBB + diag(1e-10, nrow(tBB)) }
     
     pred <- as.matrix(expr %*% B %*% tcrossprod(chol2inv(chol(tBB)), B))
     
@@ -226,7 +226,7 @@ spatialTestFixed <- function(expr, coord, knot = F, maxknotallowed = 5) {
   res$fdr <- stats::p.adjust(res$pval, method = 'fdr')
   res$knotnum <- knotnum
   res <- res[, c("fdr", "logpval", "pval", "fstat", "knotnum")]
-  res <- res[order(res$logpval, -res$fstat), ]
+  res <- res[order(res$pval, -res$fstat), ]
   return(res)
 }
 
@@ -247,6 +247,8 @@ spatialFit <- function(expr, coord, knot = F, maxknotallowed = 5) {
     colnames(B) <- NULL
     tBB <- crossprod(B)
     rownames(tBB) <- colnames(tBB) <- NULL
+    
+    if ('try-error'%in%class(try(chol(tBB), silent = T))) { tBB <- tBB + diag(1e-10, nrow(tBB)) }
     
     pred <- as.matrix(expr %*% B %*% tcrossprod(chol2inv(chol(tBB)), B))
     return(pred)

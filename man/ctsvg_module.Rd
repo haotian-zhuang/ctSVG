@@ -4,14 +4,14 @@
 \alias{ctsvg_module}
 \title{Identify gene modules within each cell cluster}
 \usage{
-ctsvg_module(d, clutestRes, clufitRes, seed = 2024, clunum = NULL)
+ctsvg_module(clutestRes, clufitRes, sc, seed = 2024, clunum = NULL)
 }
 \arguments{
-\item{d}{The output from \code{\link{runseurat}}}
-
 \item{clutestRes}{The output from \code{\link{ctsvg_test}}}
 
 \item{clufitRes}{The output from \code{\link{ctsvg_fit}}}
+
+\item{sc}{The named vector of cell cluster assignments}
 
 \item{seed}{Random seed for k-means clustering (2024 by default)}
 

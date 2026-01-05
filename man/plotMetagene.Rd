@@ -4,16 +4,16 @@
 \alias{plotMetagene}
 \title{Visualize spatial patterns of metagenes within a cell cluster}
 \usage{
-plotMetagene(d, clufitRes, moduleRes, coord, cellclu, background = FALSE, ...)
+plotMetagene(clufitRes, coord, sc, moduleRes, cellclu, background = FALSE, ...)
 }
 \arguments{
-\item{d}{The output from \code{\link{runseurat}}}
-
 \item{clufitRes}{The output from \code{\link{ctsvg_fit}}}
 
-\item{moduleRes}{The output from \code{\link{ctsvg_module}}}
+\item{coord}{The matrix of spatial locations}
 
-\item{coord}{The matrix of spatial locations from \code{\link{cellassign}}}
+\item{sc}{The named vector of cell cluster assignments}
+
+\item{moduleRes}{The output from \code{\link{ctsvg_module}}}
 
 \item{cellclu}{A character value indicating which cell cluster to plot}
 

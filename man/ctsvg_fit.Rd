@@ -4,12 +4,14 @@
 \alias{ctsvg_fit}
 \title{Fit spatial gene expression patterns within each cell cluster}
 \usage{
-ctsvg_fit(d, coord, cell.filter = TRUE)
+ctsvg_fit(expr, coord, sc, cell.filter = TRUE)
 }
 \arguments{
-\item{d}{The output from \code{\link{runseurat}}}
+\item{expr}{The normalized gene expression matrix}
 
-\item{coord}{The matrix of spatial locations from \code{\link{cellassign}}}
+\item{coord}{The matrix of spatial locations}
+
+\item{sc}{The named vector of cell cluster assignments}
 
 \item{cell.filter}{Whether to remove spatially isolated cells within each cell cluster (\code{TRUE} by default)}
 }

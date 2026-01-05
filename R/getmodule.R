@@ -1,16 +1,15 @@
 #' Identify gene modules within each cell cluster
 #'
-#' @param d The output from \code{\link{runseurat}}
 #' @param clutestRes The output from \code{\link{ctsvg_test}}
 #' @param clufitRes The output from \code{\link{ctsvg_fit}}
+#' @param sc The named vector of cell cluster assignments
 #' @param seed Random seed for k-means clustering (2024 by default)
 #' @param clunum Number of modules (\code{NULL} by default, automatically selected)
-#' @import Seurat
+
 #' @return A list with each element representing a cell cluster and indicating which module each gene belongs to
 #' @export
 #'
-ctsvg_module <- function(d, clutestRes, clufitRes, seed = 2024, clunum = NULL) {
-  sc <- Idents(d)
+ctsvg_module <- function(clutestRes, clufitRes, sc, seed = 2024, clunum = NULL) {
   sccell <- split(names(sc), sc)
   ctsvg <- clutestRes[clutestRes$fdr < 0.05, ]
   

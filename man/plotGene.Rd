@@ -5,9 +5,10 @@
 \title{Visualize spatial patterns of a single gene}
 \usage{
 plotGene(
-  d,
+  expr,
   clufitRes = NULL,
   coord,
+  sc,
   gene,
   cellclu = NULL,
   background = FALSE,
@@ -15,11 +16,13 @@ plotGene(
 )
 }
 \arguments{
-\item{d}{The output from \code{\link{runseurat}}}
+\item{expr}{The normalized gene expression matrix}
 
 \item{clufitRes}{The output from \code{\link{ctsvg_fit}} (\code{NULL} by default, original gene expression matrix)}
 
-\item{coord}{The matrix of spatial locations from \code{\link{cellassign}}}
+\item{coord}{The matrix of spatial locations}
+
+\item{sc}{The named vector of cell cluster assignments}
 
 \item{gene}{Which gene to plot}
 

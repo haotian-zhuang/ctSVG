@@ -1,0 +1,72 @@
+---
+title: "Apply ctSVG to Xenium data"
+author: "Haotian Zhuang"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Apply ctSVG to Xenium data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+We will demonstrate how to use ctSVG to identify cell-type-specific SVGs with cell type annotations from Xenium data. The Xenium dataset of a human lung cancer sample was downloaded from the [10x website](https://www.10xgenomics.com/datasets/preview-data-ffpe-human-lung-cancer-with-xenium-multimodal-cell-segmentation-1-standard).
+
+# Load package
+```{r setup}
+library(ctSVG)
+mydir <- "~/Desktop/Research/ctSVG/xenium_human_lungcancer"
+list.files(mydir)
+expr <- readRDS(file.path(mydir, "expr.rds"))
+coord <- readRDS(file.path(mydir, "coord.rds"))
+sc <- readRDS(file.path(mydir, "sc.rds"))
+str(expr)
+str(coord)
+str(sc)
+sc <- sc[sc %in% levels(sc)[1:3]]
+sc <- droplevels(sc)
+```
+
+# Identify spatially variable genes within each cell cluster
+```{r}
+suppressMessages(suppressWarnings(
+  clutestRes <- ctsvg_test(expr = expr, coord = coord, sc = sc)
+))
+head(clutestRes)
+```
+
+# Fit spatial gene expression patterns within each cell cluster
+```{r}
+clufitRes <- ctsvg_fit(expr = expr, coord = coord, sc = sc)
+```
+
+# Visualize spatial patterns of a single gene
+```{r}
+plotGene(expr = expr, clufitRes = clufitRes, coord = coord, sc = sc,
+         gene = clutestRes$gene[1], cellclu = "0", background = TRUE)
+```
+
+# Identify gene modules within each cell cluster
+```{r}
+moduleRes <- ctsvg_module(clutestRes = clutestRes, clufitRes = clufitRes, sc = sc)
+```
+
+# Visualize spatial patterns of metagenes within a cell cluster
+```{r}
+plotMetagene(clufitRes = clufitRes, coord = coord, sc = sc,
+             moduleRes = moduleRes, cellclu = "0", background = TRUE)
+```
+
+<details>
+  <summary>**Session Info**</summary>
+```{r}
+sessionInfo()
+```
+</details>

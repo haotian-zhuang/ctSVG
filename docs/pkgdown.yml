@@ -1,9 +1,10 @@
-pandoc: '3.2'
+pandoc: 3.6.3
 pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
-  Visium HD: Visium HD.html
-last_built: 2024-11-01T04:40Z
+  visiumHD: visiumHD.html
+  xenium: xenium.html
+last_built: 2026-01-05T04:07Z
 urls:
   reference: https://haotian-zhuang.github.io/ctSVG/reference
   article: https://haotian-zhuang.github.io/ctSVG/articles
